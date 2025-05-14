@@ -17,6 +17,12 @@ def init_driver(headless=True):
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
     return driver
 
+def confirm_10_digit_hs_code(hs_code_6_digit: str, confirmed_code: str):
+    driver = open_uk_tariff_finder(hs_code_6_digit, init_driver())
+    time.sleep(5)
+    driver.quit()
+    return confirmed_code.strip()
+
 # --- Search UK commodity page for 6-digit HS code ---
 def open_uk_tariff_finder(hs_code_6_digit, driver):
     url = "https://trade-tariff.service.gov.uk/find_commodity"
