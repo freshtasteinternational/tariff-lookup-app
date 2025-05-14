@@ -16,6 +16,12 @@ from US_logic import (
     get_us_tariff
 )
 
+from datetime import date
+today = date.today()
+day = today.day
+month = today.month
+year = today.year
+
 st.set_page_config(page_title="Tariff Lookup App", layout="centered")
 st.title("Multi-Country Tariff Lookup")
 st.markdown("Use this tool to estimate import duties for Canada, the UK, and the US.")
@@ -34,7 +40,10 @@ if hs_code_6 and origin_country and destination_country:
         st.markdown("#### Open the relevant tariff search page to confirm your full HS code:")
 
         if destination_country == "United Kingdom":
-            st.markdown(f"[UK Tariff Lookup](https://www.trade-tariff.service.gov.uk/headings/{hs_code_6})")
+            st.markdown("Try one of the following UK Tariff links (the suffix may vary):")
+            for suffix in ["10", "80"]:
+                url = f"https://www.trade-tariff.service.gov.uk/subheadings/{hs_code_6}0000-{suffix}?day={day}&month={month}&year={year}"
+                st.markdown(f"- [{hs_code_6}0000-{suffix}]({url})")
 
         elif destination_country == "Canada":
             st.markdown(f"[Canada Tariff Finder](https://www.tariffinder.ca/en/search#/tariff/{hs_code_6})")
