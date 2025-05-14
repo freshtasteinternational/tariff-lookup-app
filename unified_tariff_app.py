@@ -46,7 +46,7 @@ if hs_code_6 and origin_country and destination_country:
                 st.markdown(f"- [{hs_code_6}0000-{suffix}]({url})")
 
         elif destination_country == "Canada":
-            st.markdown(f"[Canada Tariff Finder](https://www.tariffinder.ca/en/search#/tariff/{hs_code_6})")
+            st.markdown("[Canada Tariff Finder](https://www.tariffinder.ca/en/getStarted)")
 
         elif destination_country == "United States":
             st.markdown(f"[US HTS Lookup](https://hts.usitc.gov/search?query={hs_code_6})")
