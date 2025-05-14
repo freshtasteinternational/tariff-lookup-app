@@ -155,13 +155,12 @@ def interpret_duty(driver, applicable_rate, customs_value, quantity_input=None):
             return (cents / 100) * quantity
     return 0
 
-# --- Confirm full HS code (UI already opened) ---
-def confirm_10_digit_hs_code(hs_code_6_digit: str, manual_confirmed_code: str):
+# --- Confirm full HS code (API-compatible) ---
+def confirm_10_digit_hs_code(hs_code_6_digit: str, confirmed_code: str):
     driver = open_hts_search_page(hs_code_6_digit)
-    print("✔ Browser opened for HS code confirmation. Waiting for external confirmation...")
     time.sleep(5)
     driver.quit()
-    return manual_confirmed_code.strip()
+    return confirmed_code.strip()
 
 # --- Core callable logic ---
 def get_us_tariff(confirmed_code, origin_country, customs_value, quantity_input=None):
