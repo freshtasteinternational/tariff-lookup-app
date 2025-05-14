@@ -78,38 +78,6 @@ def get_available_countries(driver):
     except:
         return []
 
-def confirm_10_digit_hs_code(hs_code_6_digit, country_code):
-    driver = init_driver()
-    driver.get("https://www.tariffinder.ca/en/getStarted")
-    time.sleep(3)
-    try:
-        WebDriverWait(driver, 10).until(
-            EC.element_to_be_clickable((By.XPATH, '//*[@id="q-app"]/div/div[1]/main/div[2]/div[1]/div/div[3]/div[3]/span'))
-        ).click()
-        time.sleep(2)
-
-        WebDriverWait(driver, 10).until(
-            EC.element_to_be_clickable((By.XPATH, '//*[@id="q-app"]/div/div[1]/main/div[2]/div[1]/div/div[4]/div[2]/div/div[2]/div/div'))
-        ).click()
-        time.sleep(1)
-
-        driver.find_element(By.XPATH, f"//div[contains(text(), '{country_code}')]" ).click()
-        time.sleep(1)
-
-        search_box = driver.find_element(By.XPATH, '//*[@id="q-app"]/div/div[1]/main/div[2]/div[1]/div/div[5]/div[2]/div/div[2]/div/input')
-        search_box.send_keys(hs_code_6_digit)
-        time.sleep(1)
-
-        driver.find_element(By.XPATH, '//*[@id="tms_fta_navigation_1"]').click()
-        time.sleep(3)
-
-        print("Tariff tree visible. Confirm 10-digit HS code manually.")
-        driver.quit()
-        return True
-    except:
-        driver.quit()
-        return False
-
 def open_tariff_page(driver, hs_code_10_digit, country_code):
     hs_chunk = hs_code_10_digit[:8]
     url = f"https://www.tariffinder.ca/en/search/import/{country_code}/{hs_chunk}/{hs_code_10_digit}"
