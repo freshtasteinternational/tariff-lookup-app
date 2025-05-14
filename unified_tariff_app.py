@@ -26,10 +26,24 @@ hs_code_6 = st.text_input("Enter the 6-digit HS code:")
 origin_country = st.text_input("Enter the country of origin:")
 destination_country = st.selectbox("Select destination country:", ["Canada", "United Kingdom", "United States"])
 
-# --- Step 2: Show confirmation button ---
+# --- Step 2: Show confirmation button and open external site for full HS code lookup ---
 if hs_code_6 and origin_country and destination_country:
     if st.button("→ Confirm full HS code and enter remaining data"):
+        # Reveal the next input section
         st.session_state.show_detail = True
+
+        # Open relevant tariff search page for full HS code lookup
+        if destination_country == "United Kingdom":
+            driver = init_uk_driver(headless=False)
+            open_uk_tariff_finder_and_search(hs_code_6, driver)
+
+        elif destination_country == "Canada":
+            driver = init_canada_driver(headless=False)
+            driver.get(f"https://www.tariffinder.ca/en/search#/tariff/{hs_code_6}")
+
+        elif destination_country == "United States":
+            driver = init_canada_driver(headless=False)  # You can replace this with init_us_driver if defined separately
+            driver.get(f"https://hts.usitc.gov/search?query={hs_code_6}")
 
 # --- Step 3: Detailed Input + Country Logic ---
 if st.session_state.get("show_detail", False):
