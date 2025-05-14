@@ -21,7 +21,7 @@ def init_driver(headless=True):
     return driver
 
 # --- Search UK commodity page for 6-digit HS code ---
-def open_uk_tariff_finder(hs_code_6_digit, driver):
+def open_uk_tariff_finder_and_search(hs_code_6_digit, driver):
     url = "https://trade-tariff.service.gov.uk/find_commodity"
     driver.get(url)
     time.sleep(2)
