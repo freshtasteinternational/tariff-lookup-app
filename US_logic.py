@@ -1,5 +1,3 @@
-# Refactored US tariff scraper logic for Streamlit integration (headless and form-driven)
-
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
@@ -11,13 +9,14 @@ import time
 import re
 
 # --- Initialize WebDriver ---
-def init_driver(headless=True):
+def init_driver(headless=False):  # Headless mode deactivated for Streamlit
     options = Options()
     if headless:
         options.add_argument('--headless')
         options.add_argument('--disable-gpu')
         options.add_argument('--no-sandbox')
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+    driver.maximize_window()
     return driver
 
 # --- Split full HS code into parts ---
@@ -33,10 +32,10 @@ def split_confirmed_code(confirmed_code):
         raise ValueError("HS code should be 8 or 10 digits long.")
     return heading_code, stat_suffix
 
-# --- Load HTS search page ---
+# --- Open HTS search page using 6-digit code (triggered by Streamlit button) ---
 def open_hts_search_page(hs_code):
     url = f"https://hts.usitc.gov/search?query={hs_code}"
-    driver = init_driver()
+    driver = init_driver(headless=False)  # Headless mode deactivated for Streamlit
     driver.get(url)
     time.sleep(5)
     return driver
@@ -45,7 +44,9 @@ def open_hts_search_page(hs_code):
 def scrape_rows(driver):
     WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.ID, "table-container")))
     time.sleep(2)
-    return driver.find_elements(By.XPATH, '//*[@id="table-container"]/div/table/tbody/tr')
+    rows = driver.find_elements(By.XPATH, '//*[@id="table-container"]/div/table/tbody/tr')
+    print(f"Found {len(rows)} rows on page.")
+    return rows
 
 # --- Find the best matching row for a given code ---
 def find_best_match(driver, confirmed_code, rows):
@@ -117,7 +118,7 @@ def find_special_rate(special_text, country_mapping, origin_country):
             current_rate = token
     return None
 
-# --- Follow a 'See' reference ---
+# --- Handle 'See' references ---
 def handle_see_reference(driver, see_code):
     see_url = f"https://hts.usitc.gov/search?query={see_code}"
     driver.get(see_url)
@@ -172,9 +173,16 @@ def interpret_duty(driver, applicable_rate, customs_value, quantity_input=None):
 
 # --- Core callable logic ---
 def get_us_tariff(confirmed_code, origin_country, customs_value, quantity_input=None):
+    # Step 1: Open the page using the 6-digit heading code (hs_code)
     driver = open_hts_search_page(confirmed_code[:6])
+
+    # Step 2: Allow user to confirm full HS code (this should be handled in the interface)
+    full_code = input("Please confirm the full 8- or 10-digit HS code you want to search for: ")
+    
+    # Step 3: Use the full confirmed HS code for scraping
     rows = scrape_rows(driver)
-    idx = find_best_match(driver, confirmed_code, rows)
+    idx = find_best_match(driver, full_code, rows)
+    
     if idx is None:
         driver.quit()
         return None, None, None
@@ -186,4 +194,3 @@ def get_us_tariff(confirmed_code, origin_country, customs_value, quantity_input=
     duty = interpret_duty(driver, applicable_rate, customs_value, quantity_input)
     driver.quit()
     return description, applicable_rate, duty
-
