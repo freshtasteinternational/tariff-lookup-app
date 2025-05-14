@@ -1,6 +1,3 @@
-# This refactored script is meant to be called from a Streamlit front-end, so it no longer uses print() or input()
-# All interactions (HS code input, quantity, values) are managed via the interface.
-
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
@@ -35,7 +32,7 @@ def open_uk_tariff_finder(hs_code_6_digit, driver):
         time.sleep(1)
         driver.find_element(By.XPATH, '//*[@id="new_search"]/div/div[3]/input').click()
         time.sleep(2)
-    except:
+    except Exception:
         return None
     return driver
 
@@ -59,7 +56,7 @@ def navigate_to_duty_calculator(hs_code, driver):
         duty_calc_link.click()
         time.sleep(2)
         return True
-    except:
+    except Exception:
         return False
 
 # --- Handle unit-based tariff input ---
@@ -76,7 +73,7 @@ def input_variable_unit(driver, quantity):
             EC.presence_of_element_located((By.XPATH, '//*[@id="main-content"]/div/div/a[2]'))
         ).click()
         return unit_text
-    except:
+    except Exception:
         return None
 
 # --- Extract tariff information ---
@@ -89,7 +86,7 @@ def extract_tariff_info(driver):
         option2_row = driver.find_elements(By.XPATH, '//*[@id="main-content"]/div/div/table[2]/tbody/tr[4]')
         if option2_row:
             tariff_data["Option 2 Duty Total"] = option2_row[0].find_element(By.XPATH, 'td[3]').text
-    except:
+    except Exception:
         pass
     return tariff_data
 
@@ -125,6 +122,6 @@ def get_uk_tariff(hs_code, country_origin, customs_value, shipping_cost, insuran
         driver.quit()
         return tariff_data, unit_used
 
-    except:
+    except Exception:
         driver.quit()
         return None, None
