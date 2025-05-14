@@ -20,6 +20,16 @@ def init_driver(headless=True):
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
     return driver
 
+# --- Utilities ---
+def confirm_10_digit_hs_code(hs_code_6_digit: str):
+    driver = open_hts_search_page(hs_code_6_digit)
+    print("Browser opened to confirm the full HS code.")
+
+    confirmed_code = input("Please enter the full 8- or 10-digit HS code you selected from the site: ").strip()
+    driver.quit()
+
+    return confirmed_code
+
 # --- Split full HS code into parts ---
 def split_confirmed_code(confirmed_code):
     confirmed_code = confirmed_code.strip().replace(".", "")
