@@ -1,5 +1,3 @@
-# Canada_lookup17.py (final structure for Streamlit integration)
-
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
@@ -75,7 +73,7 @@ def get_available_countries(driver):
 
         elements = driver.find_elements(By.XPATH, '//div[@class="q-item-label"]')
         return [elem.text.strip() for elem in elements if elem.text.strip()]
-    except:
+    except Exception:
         return []
 
 def confirm_10_digit_hs_code(hs_code_6_digit, country_code):
@@ -103,10 +101,9 @@ def confirm_10_digit_hs_code(hs_code_6_digit, country_code):
         driver.find_element(By.XPATH, '//*[@id="tms_fta_navigation_1"]').click()
         time.sleep(3)
 
-        print("Tariff tree visible. Confirm 10-digit HS code manually.")
         driver.quit()
         return True
-    except:
+    except Exception:
         driver.quit()
         return False
 
@@ -121,7 +118,7 @@ def scrape_mfn_tariff(driver):
     try:
         elem = driver.find_element(By.XPATH, '//*[@id="q-app"]/div/div[1]/main/div/div[6]/div/div[1]/div/table/thead/tr/th[2]')
         return parse_tariff_text(elem.text.strip()) + ("MFN",)
-    except:
+    except Exception:
         return 0.0, "value", "MFN (Error)", "MFN"
 
 def scrape_tariff(driver, force_mfn=False):
@@ -152,11 +149,11 @@ def scrape_tariff(driver, force_mfn=False):
                     candidate = min(rates)
                     if best_rate is None or candidate < best_rate:
                         best_rate = candidate
-            except:
+            except Exception:
                 continue
         if best_rate is not None:
             return best_rate / 100, "value", "FTA - Ad valorem (%)", "FTA"
         else:
             raise Exception("No valid FTA found")
-    except:
+    except Exception:
         return scrape_mfn_tariff(driver)
